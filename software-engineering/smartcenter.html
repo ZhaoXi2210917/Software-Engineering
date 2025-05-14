@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能中心</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-color: #e0f7fa;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .smart-center-content {
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            margin: 20px;
+            overflow-y: auto;
+            text-align: center;
+        }
+
+        .smart-center-content h2 {
+            color: #00796b;
+        }
+
+        .smart-center-content p {
+            color: #004d40;
+        }
+
+        .module {
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .module h3 {
+            color: #00796b;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .module button {
+            background-color: #00796b;
+            color: #ffffff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .module button:hover {
+            background-color: #004d40;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="smart-center-content">
+        <h2>大模型智能体</h2>
+        <p>引导用户进行数据分析和智能评估。</p>
+
+        <div class="grid-container">
+            <div class="module">
+                <h3>养殖趋势预测</h3>
+                <p>基于数据预测未来的养殖趋势。</p>
+                <button onclick="location.href='trend_analysis.html'">查看详情</button>
+            </div>
+
+            <div class="module">
+                <h3>风险评估</h3>
+                <p>提供当前风险评估报告。</p>
+                <button onclick="location.href='risk_assessment.html'">查看详情</button>
+            </div>
+
+            <div class="module">
+                <h3>决策支持</h3>
+                <p>基于数据分析提供决策建议。</p>
+                <button onclick="location.href='decision_support.html'">查看详情</button>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+        function loadContent(page) {
+            fetch(page)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById("content").innerHTML = html;
+                })
+                .catch(error => console.error('Error loading content:', error));
+        }
+         function logout() {
+            window.location.href = "index.html";
+        }
+    </script>       
+</html>

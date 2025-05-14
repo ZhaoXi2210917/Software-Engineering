@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员管理界面</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-color: #e0f7fa;
+            font-family: 'Arial', sans-serif;
+        }
+
+        #admin-container {
+            display: flex;
+            height: 100vh;
+            /* background-image: url('background.jpg'); */
+            background-size: cover;
+            background-position: center;
+        }
+
+        #sidebar {
+            width: 250px;
+            background-color: rgba(0, 121, 107, 0.9);
+            padding: 20px;
+            box-shadow: 5px 0px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        #sidebar a {
+            display: block;
+            padding: 10px;
+            color: #ffffff;
+            text-decoration: none;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+
+        #sidebar a:hover {
+            background-color: #004d40;
+        }
+
+        .logout-btn {
+            background-color: #d32f2f;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #b71c1c;
+        }
+
+        .admin-content {
+            flex: 1;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            margin: 20px;
+            overflow-y: auto;
+        }
+
+        .user-list table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+        }
+
+        .user-list th,
+        .user-list td {
+            padding: 10px;
+            border: 1px solid #b2dfdb;
+            text-align: center;
+        }
+
+        .user-list button {
+            padding: 5px 10px;
+            background-color: #00796b;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="admin-container">
+        <div id="sidebar">
+            <div>
+                <h2 style="color: #ffffff;">仪表盘</h2>
+                <a href="dashboard.html">普通页面</a>
+                <a href="admin.html">用户管理</a>
+            </div>
+            <button class="logout-btn" onclick="logout()">退出登录</button>
+        </div>
+
+        <div class="admin-content">
+            <h2>管理员管理界面</h2>
+            <div class="user-list">
+                <h3>用户管理</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>用户名</th>
+                            <th>角色</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-list"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+       // 加载用户列表
+function loadUsers() {
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const userList = document.getElementById("user-list");
+    userList.innerHTML = "";
+
+    users.forEach((user, index) => {
+        userList.innerHTML += `
+            <tr>
+                <td>${user.username}</td>
+                <td>${user.role}</td>
+                <td>
+                    <button onclick="toggleRole(${index})">改变权限</button>
+                    <button onclick="deleteUser(${index})" class="delete-btn">删除</button>
+                </td>
+            </tr>`;
+    });
+}
+
+// 删除用户函数
+function deleteUser(index) {
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+
+    if (index >= 0 && index < users.length) {
+        users.splice(index, 1);
+        localStorage.setItem("users", JSON.stringify(users));
+        loadUsers();
+    }
+}
+
+// 初始化用户列表
+document.addEventListener("DOMContentLoaded", loadUsers);
+
+
+        function toggleRole(index) {
+            const users = JSON.parse(localStorage.getItem("users")) || [];
+            if (users[index].role === "user") {
+                users[index].role = "admin";
+            } else {
+                users[index].role = "user";
+            }
+            localStorage.setItem("users", JSON.stringify(users));
+            loadUsers();
+        }
+
+        // 退出登录功能
+        function logout() {
+            localStorage.removeItem("role");
+            window.location.href = "index.html";
+        }
+
+        window.onload = loadUsers;
+    </script>
+</body>
+
+</html>
