@@ -1,0 +1,34 @@
+<!-- trend_analysis.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>养殖趋势预测</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        async function loadContent(url, elementId) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("数据加载失败");
+                const data = await response.json();
+                document.getElementById(elementId).innerHTML = JSON.stringify(data, null, 2);
+            } catch (error) {
+                console.error("Error loading content: ", error);
+                document.getElementById(elementId).innerHTML = "加载失败，请稍后重试。";
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="smart-center-content">
+        <h2>养殖趋势预测</h2>
+        <div id="trendData">加载数据中...</div>
+    </div>
+    <script>
+        window.onload = function() {
+            loadContent('/api/trend_data', 'trendData');
+        };
+    </script>
+</body>
+</html>

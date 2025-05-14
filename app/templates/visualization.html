@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据库交互可视化页面</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #e0f7fa;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .visualization-container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .visualization-container h2 {
+            color: #00796b;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="visualization-container">
+        <h2>数据库交互可视化页面</h2>
+
+        <div class="chart-container">
+            <h3>数据变化趋势图</h3>
+            <canvas id="lineChart" width="600" height="400"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h3>数据分类柱状图</h3>
+            <canvas id="barChart" width="600" height="400"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:3000/api/visualization";
+
+        // 获取数据并渲染图表
+        async function fetchData() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+
+                // 数据解析
+                const labels = data.map(item => item.label);
+                const values = data.map(item => item.value);
+
+                // 渲染折线图
+                renderLineChart(labels, values);
+
+                // 渲染柱状图
+                renderBarChart(labels, values);
+
+            } catch (error) {
+                console.error("数据加载失败：", error);
+            }
+        }
+
+        // 渲染折线图
+        function renderLineChart(labels, data) {
+            const ctx = document.getElementById('lineChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '数据趋势',
+                        data: data,
+                        borderColor: '#00796b',
+                        backgroundColor: 'rgba(0, 121, 107, 0.2)',
+                        borderWidth: 2,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: '数据变化趋势图'
+                        }
+                    }
+                }
+            });
+        }
+
+        // 渲染柱状图
+        function renderBarChart(labels, data) {
+            const ctx = document.getElementById('barChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '数据分类',
+                        data: data,
+                        backgroundColor: '#00796b',
+                        borderColor: '#004d40',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: '数据分类柱状图'
+                        }
+                    }
+                }
+            });
+        }
+
+        // 页面加载完成后获取数据
+        document.addEventListener("DOMContentLoaded", fetchData);
+    </script>
+
+</body>
+
+</html>
