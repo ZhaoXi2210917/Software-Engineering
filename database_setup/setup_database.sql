@@ -41,6 +41,21 @@ CREATE TABLE IF NOT EXISTS sensor_data (
     INDEX idx_recorded_at (recorded_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 创建鱼类信息表
+CREATE TABLE fish (
+    id INT PRIMARY KEY AUTO_INCREMENT,              -- 主键
+    species VARCHAR(50) NOT NULL,                   -- 种类
+    weight FLOAT NOT NULL,                          -- 体重（g）
+    length1 FLOAT NOT NULL,                         -- 体长-1（cm）
+    length2 FLOAT NOT NULL,                         -- 体长-2（cm）
+    length3 FLOAT NOT NULL,                         -- 体长-3（cm）
+    height FLOAT NOT NULL,                          -- 高度（cm）
+    width FLOAT NOT NULL,                           -- 宽度（cm）
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_species (species)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- 初始管理员账户（明文密码，仅用于开发）
 INSERT INTO users (username, email, password, role) 
 VALUES ('admin', 'admin@oceanranch.com', 'admin123', 'admin');
