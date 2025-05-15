@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #chat-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+        #chat-box div {
+            margin: 5px 0;
+        }
+        .user {
+            text-align: right;
+            color: blue;
+        }
+        .bot {
+            text-align: left;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>简单对话</h1>
+    <div id="chat-box"></div>
+    <input type="text" id="user-input" placeholder="输入你的消息..." />
+    <button id="send-btn">发送</button>
+
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        sendBtn.addEventListener('click', async () => {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            // 显示用户消息
+            const userMessage = document.createElement('div');
+            userMessage.className = 'user';
+            userMessage.textContent = `你: ${message}`;
+            chatBox.appendChild(userMessage);
+
+            // 清空输入框
+            userInput.value = '';
+
+            // 调用后端 API
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message }),
+                });
+
+                const data = await response.json();
+
+                // 显示机器人回复
+                const botMessage = document.createElement('div');
+                botMessage.className = 'bot';
+                botMessage.textContent = `智能助手: ${data.reply}`;
+                chatBox.appendChild(botMessage);
+
+                // 滚动到底部
+                chatBox.scrollTop = chatBox.scrollHeight;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+</html>
