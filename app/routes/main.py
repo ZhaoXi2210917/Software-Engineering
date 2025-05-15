@@ -16,5 +16,6 @@ def admin():
 @bp.route('/dashboard.html')
 def dashboard():
     # 跳转到 user 蓝图的控制台页面
-    return redirect(url_for('user.load_page', page='dashboard'))
+    # return redirect(url_for('user.load_page', page='dashboard'))
+    return render_template('dashboard.html')
 
