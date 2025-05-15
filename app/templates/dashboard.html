@@ -94,22 +94,58 @@
             <p>请选择左侧菜单中的功能查看详细内容。</p>
         </div>
     </div>
-
     <script>
-    function loadContent(route) {
-        fetch(`/user/${route}`) // 调用 Flask 的 API 路由
-            .then(response => {
+        function loadContent(route) {
+            fetch(route) // 调用 Flask 的 API 路由
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    document.getElementById("content").innerHTML = html; // 插入返回的 HTML
+                })
+                .catch(error => console.error('Error loading content from Flask route:', error));
+        }
+                // 体长预测
+        async function predictLength() {
+            try {
+                const fishType = document.getElementById("fishType").value;
+                const length1 = document.getElementById("length1").value;
+                const length2 = document.getElementById("length2").value;
+
+                const requestData = {
+                    species: fishType,
+                    length1: length1,
+                    length2: length2
+                };
+
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                return response.text();
-            })
-            .then(html => {
-                document.getElementById("content").innerHTML = html; // 插入返回的 HTML
-            })
-            .catch(error => console.error('Error loading content from Flask route:', error));
-    }
 
+                const result = await response.json();
+
+                if (!result || typeof result.length3 !== 'number') {
+                    throw new Error("Invalid response format");
+                }
+
+                const resultDiv = document.getElementById("result");
+                resultDiv.textContent = `鱼类种类: ${result.fish_type}, 预测的 Length 3: ${result.length3.toFixed(2)}`;
+            } catch (error) {
+                console.error("Error:", error);
+                alert("预测失败，请检查后端服务是否正常运行！");
+            }
+        }
         function logout() {
             window.location.href = "/";
         }

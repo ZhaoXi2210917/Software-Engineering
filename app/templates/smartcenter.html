@@ -74,52 +74,57 @@
             <div class="module">
                 <h3>养殖趋势预测</h3>
                 <p>基于数据预测未来的养殖趋势。</p>
-                <button onclick="location.href='trend_analysis'">查看详情</button>
+                <button onclick="loadContent('trend_analysis')">查看详情</button>
             </div>
 
             <div class="module">
                 <h3>风险评估</h3>
                 <p>提供当前风险评估报告。</p>
-                <button onclick="location.href='risk_assessment'">查看详情</button>
+                <button onclick="loadContent('risk_assessment')">查看详情</button>
             </div>
 
             <div class="module">
                 <h3>决策支持</h3>
                 <p>基于数据分析提供决策建议。</p>
-                <button onclick="location.href='decision_support'">查看详情</button>
+                <button onclick="loadContent('decision_support')">查看详情</button>
             </div>  
             <div class="module">
                 <h3>鱼类体长预测</h3>
                 <p>基于图片识别技术进行鱼类体长预测。</p>
-                <button onclick="location.href='length_predict'">查看详情</button>
+                <button onclick="loadContent('length_predict')">查看详情</button>
+            </div>
+            <div class="module">
+                <h3>对话</h3>
+                <p>简单问答。</p>
+<!--                <button onclick="loadContent('chat.html')">查看详情</button>-->
+                <button onclick="location.href = 'chat.html'">查看详情</button>
+            </div>
+            <div class="module">
+                <h3>图片提问</h3>
+                <p>简单问答。</p>
+<!--                <button onclick="loadContent('image')">查看详情</button>-->
+                <button onclick="location.href = 'image'">查看详情</button>
+            </div>
         </div>
-        <div class="module">
-            <h3>对话</h3>
-            <p>简单问答。</p>
-            <button onclick="location.href='chat'">查看详情</button>
-        </div>
-        <div class="module">
-            <h3>图片提问</h3>
-            <p>简单问答。</p>
-            <button onclick="location.href='image'">查看详情</button>
-    </div>
     </div>
 </body>
-<script>
-    function loadContent(route) {
-        fetch(`/user/${route}`) // 调用 Flask 的 API 路由
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.text();
-            })
-            .then(html => {
-                document.getElementById("content").innerHTML = html; // 插入返回的 HTML
-            })
-            .catch(error => console.error('Error loading content from Flask route:', error));
-    }
-
+    <script>
+        function loadContent(route) {
+            fetch(route) // 调用 Flask 的 API 路由
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    document.getElementById("content").innerHTML = html; // 插入返回的 HTML
+                    // 体长预测
+                    const predict_button = document.querySelector("#predictForm button");
+                    if (predict_button) button.onclick = predictLength;
+                })
+                .catch(error => console.error('Error loading content from Flask route:', error));
+        }
         function logout() {
             window.location.href = "/";
         }

@@ -52,45 +52,45 @@
 
     <div id="result" class="result"></div>
 
-    <script>
-async function predictLength() {
-    try {
-        const fishType = document.getElementById("fishType").value;
-        const length1 = document.getElementById("length1").value;
-        const length2 = document.getElementById("length2").value;
+<!--    <script>-->
+<!--async function predictLength() {-->
+<!--    try {-->
+<!--        const fishType = document.getElementById("fishType").value;-->
+<!--        const length1 = document.getElementById("length1").value;-->
+<!--        const length2 = document.getElementById("length2").value;-->
 
-        const requestData = {
-            species: fishType,
-            length1: length1,
-            length2: length2
-        };
+<!--        const requestData = {-->
+<!--            species: fishType,-->
+<!--            length1: length1,-->
+<!--            length2: length2-->
+<!--        };-->
 
-        const response = await fetch('/predict', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestData)
-        });
+<!--        const response = await fetch('/predict', {-->
+<!--            method: 'POST',-->
+<!--            headers: {-->
+<!--                'Content-Type': 'application/json'-->
+<!--            },-->
+<!--            body: JSON.stringify(requestData)-->
+<!--        });-->
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+<!--        if (!response.ok) {-->
+<!--            throw new Error(`HTTP error! status: ${response.status}`);-->
+<!--        }-->
 
-        const result = await response.json();
+<!--        const result = await response.json();-->
 
-        if (!result || typeof result.length3 !== 'number') {
-            throw new Error("Invalid response format");
-        }
+<!--        if (!result || typeof result.length3 !== 'number') {-->
+<!--            throw new Error("Invalid response format");-->
+<!--        }-->
 
-        const resultDiv = document.getElementById("result");
-        resultDiv.textContent = `鱼类种类: ${result.fish_type}, 预测的 Length 3: ${result.length3.toFixed(2)}`;
-    } catch (error) {
-        console.error("Error:", error);
-        alert("预测失败，请检查后端服务是否正常运行！");
-    }
-}
+<!--        const resultDiv = document.getElementById("result");-->
+<!--        resultDiv.textContent = `鱼类种类: ${result.fish_type}, 预测的 Length 3: ${result.length3.toFixed(2)}`;-->
+<!--    } catch (error) {-->
+<!--        console.error("Error:", error);-->
+<!--        alert("预测失败，请检查后端服务是否正常运行！");-->
+<!--    }-->
+<!--}-->
 
-    </script>
+<!--    </script>-->
 </body>
 </html>
