@@ -73,8 +73,8 @@
             color: #00796b;
         }
     </style>
+    <script src="https://fastly.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 </head>
-
 <body>
     <div id="dashboard-container">
         <div id="sidebar">
@@ -84,7 +84,6 @@
                 <a href="#" onclick="loadContent('underwater')">水下系统</a>
                 <a href="#" onclick="loadContent('smartcenter')">智能中心</a>
                 <a href="#" onclick="loadContent('datacenter')">数据中心</a>
-
             </div>
             <button class="logout-btn" onclick="logout()">退出登录</button>
         </div>
@@ -104,11 +103,29 @@
                     return response.text();
                 })
                 .then(html => {
-                    document.getElementById("content").innerHTML = html; // 插入返回的 HTML
+                    // 1. 插入 HTML 内容
+                    const contentElement = document.getElementById("content");
+                    contentElement.innerHTML = html;
+                    // 2. 提取并执行脚本
+                    const scripts = contentElement.getElementsByTagName('script');
+                    Array.from(scripts).forEach(oldScript => {
+                        // 创建新脚本元素
+                        const newScript = document.createElement('script');
+                        // 复制脚本内容
+                        newScript.text = oldScript.innerHTML;
+                        // 处理外部脚本（如果有）
+                        if (oldScript.src) {
+                            newScript.src = oldScript.src;
+                        }
+                        // 将新脚本插入到文档中
+                        document.body.appendChild(newScript);
+                        // 移除旧脚本避免重复
+                        oldScript.parentNode.removeChild(oldScript);
+                    });
                 })
                 .catch(error => console.error('Error loading content from Flask route:', error));
         }
-                // 体长预测
+        // 体长预测
         async function predictLength() {
             try {
                 const fishType = document.getElementById("fishType").value;
