@@ -56,6 +56,33 @@ CREATE TABLE fish (
     INDEX idx_species (species)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 创建水质信息表
+CREATE TABLE water_data (
+    id INT PRIMARY KEY AUTO_INCREMENT,              -- 主键
+    province VARCHAR(50) NOT NULL,                  -- 省份
+    river_basin VARCHAR(50) NOT NULL,               -- 流域
+    section_name VARCHAR(100) NOT NULL,             -- 断面名称
+    monitoring_time DATETIME NOT NULL,              -- 监测时间
+    water_quality_category VARCHAR(10) ,    -- 水质类别
+    temperature FLOAT,                              -- 水温(℃)
+    ph FLOAT,                                       -- pH(无量纲)
+    dissolved_oxygen FLOAT,                         -- 溶解氧(mg/L)
+    conductivity FLOAT,                             -- 电导率(μS/cm)
+    turbidity FLOAT,                                -- 浊度(NTU)
+    permanganate_index FLOAT,                       -- 高锰酸盐指数(mg/L)
+    ammonia_nitrogen FLOAT,                         -- 氨氮(mg/L)
+    total_phosphorus FLOAT,                         -- 总磷(mg/L)
+    total_nitrogen FLOAT,                           -- 总氮(mg/L)
+    chlorophyll_a FLOAT,                            -- 叶绿素α(mg/L)
+    algae_density FLOAT,                            -- 藻密度(cells/L)
+    station_status VARCHAR(50),                     -- 站点情况
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 创建时间
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 更新时间
+    INDEX idx_province (province),                  -- 索引：省份
+    INDEX idx_river_basin (river_basin),            -- 索引：流域
+    INDEX idx_section_name (section_name)           -- 索引：断面名称
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- 初始管理员账户（明文密码，仅用于开发）
 INSERT INTO users (username, email, password, role) 
 VALUES ('admin', 'admin@oceanranch.com', 'admin123', 'admin');

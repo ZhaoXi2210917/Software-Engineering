@@ -114,6 +114,34 @@ def get_width():
     width_list = [row['width'] for row in results]
     return jsonify(width_list)
 
+# 获取水质信息
+@bp.route('/getWaterData')
+def get_water_data():
+    # 连接数据库
+    conn = mysql.connector.connect(**DB_CONFIG)
+    cursor = conn.cursor(dictionary=True)  # 返回字典格式的结果
+    cursor.execute("""
+    SELECT temperature,ph,dissolved_oxygen,conductivity,turbidity,permanganate_index
+    FROM water_data
+    ORDER BY monitoring_time DESC
+    LIMIT 1
+    """)
+    # 获取结果
+    results = cursor.fetchall()
+    # 关闭连接
+    cursor.close()
+    conn.close()
+    result = results[0]
+    ordered_data = [
+        result['ph'],
+        result['temperature'],
+        result['dissolved_oxygen'],
+        result['conductivity'],
+        result['turbidity'],
+        result['permanganate_index']
+    ]
+
+    return ordered_data
 # 主要信息
 @bp.route('/info')
 def info():

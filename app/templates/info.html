@@ -163,129 +163,162 @@
             }]
         });
 
-        // 温度+降雨图
-        initChart('chart2', {
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                    type: 'cross',
-                    crossStyle: {
-                        color: '#999'
-                    }
-                }
-            },
-            toolbox: {},
-            legend: {
-                data: ['蒸发量', '降雨量', '温度']
-            },
-            xAxis: [
-                {
-                    type: 'category',
-                    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    axisPointer: {
-                        type: 'shadow'
-                    }
-                }
-            ],
-            yAxis: [
-                {
-                    type: 'value',
-                    name: '降雨量',
-                    min: 0,
-                    max: 250,
-                    interval: 50,
-                    axisLabel: {
-                        formatter: '{value} ml'
-                    }
-                },
-                {
-                    type: 'value',
-                    name: '温度',
-                    min: 0,
-                    max: 25,
-                    interval: 5,
-                    axisLabel: {
-                        formatter: '{value} °C'
-                    }
-                }
-            ],
-            series: [
-                {
-                    name: '蒸发量',
-                    type: 'bar',
-                    tooltip: {
-                        valueFormatter: function (value) {
-                            return value + ' ml';
+		// 获取高德地图天气数据
+        function fetchWeatherData(cityAdcode, key) {
+            return new Promise((resolve, reject) => {
+                fetch(`https://restapi.amap.com/v3/weather/weatherInfo?city=${cityAdcode}&extensions=all&key=${key}&output=json`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Network response was not ok");
                         }
-                    },
-                    data: [
-                        2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3
-                    ]
-                },
-                {
-                    name: '降雨量',
-                    type: 'bar',
-                    tooltip: {
-                        valueFormatter: function (value) {
-                            return value + ' ml';
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.status === "1" && data.info === "OK") {
+                            resolve(data);
+                        } else {
+                            reject(new Error("Failed to fetch weather data"));
                         }
-                    },
-                    data: [
-                        2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3
-                    ]
-                },
-                {
-                    name: '温度',
-                    type: 'line',
-                    yAxisIndex: 1,
-                    tooltip: {
-                        valueFormatter: function (value) {
-                            return value + ' °C';
-                        }
-                    },
-                    data: [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
-                }
-            ]
-        });
+                    })
+                    .catch(error => {
+                        reject(error);
+                    });
+            });
+        }
+
+		// 处理天气数据并生成柱状图
+		function generateChart(cityAdcode, key) {
+		    fetchWeatherData(cityAdcode, key)
+		        .then(data => {
+		            // 获取未来几天的天气预报数据
+		            const forecasts = data.forecasts[0].casts;
+		
+		            // 提取日期、最高温度和最低温度
+		            const dates = forecasts.map(forecast => forecast.date);
+		            const highs = forecasts.map(forecast => parseFloat(forecast.daytemp));
+		            const lows = forecasts.map(forecast => parseFloat(forecast.nighttemp));
+		
+		            // 初始化柱状图
+		            initChart('chart2', {
+		                tooltip: {
+		                    trigger: 'axis',
+		                    axisPointer: {
+		                        type: 'shadow'
+		                    }
+		                },
+		                legend: {
+		                    data: ['最高温度', '最低温度']
+		                },
+		                xAxis: {
+		                    type: 'category',
+		                    data: dates
+		                },
+		                yAxis: {
+		                    name: '温度',
+		                    type: 'value',
+		                    axisLabel: {
+		                        formatter: '{value} °C'
+		                    }
+		                },
+		                series: [
+		                    {
+		                        name: '最高温度',
+		                        type: 'bar',
+		                        data: highs,
+		                        markLine: {
+		                            data: [
+		                                { type: 'average', name: '平均值' }
+		                            ]
+		                        }
+		                    },
+		                    {
+		                        name: '最低温度',
+		                        type: 'bar',
+		                        data: lows,
+		                        markLine: {
+		                            data: [
+		                                { type: 'average', name: '平均值' }
+		                            ]
+		                        }
+		                    }
+		                ]
+		            });
+		        })
+		        .catch(error => {
+		            console.error("Error fetching weather data:", error);
+		        });
+		}
+        
+        // 城市编码和高德地图 API Key
+        const cityAdcode = '120100'; // 天津市的 adcode
+        const apiKey = '8c3e8f0f8fdb5a0a99e2e7be9c28fb93';
+        generateChart(cityAdcode, apiKey);
 
         // 水质环境指标
-        initChart('chart3', {
-            dataset: {
-                source: [
-                    ['score', 'series'],
-                    [55, 'pH(无量纲)'],
-                    [40, '溶解氧(mg/L)'],
-                    [88.9, '电导率(μS/cm)'],
-                    [67.8, '浊度(NTU)'],
-                    [55, '高锰酸盐指数(mg/L)'],
-                    [76, '氨氮(mg/L)'],
-                    [68, '总磷(mg/L)'],
-                    [48, '总氮(mg/L)']
-                ]
-            },
-            grid: { containLabel: true },
-            xAxis: {},
-            yAxis: { type: 'category' },
-            visualMap: {
-                orient: 'horizontal',
-                left: 'center',
-                min: 10,
-                max: 100,
-                text: ['High Score', 'Low Score'],
-                dimension: 0,
-                inRange: {
-                    color: ['#65B581', '#FFCE34', '#FD665F']
-                }
-            },
-            series: [
-                {
-                    type: 'bar',
-                    encode: {
-                        y: 'product',
+        function fetchWaterDataAndGenerateChart() {
+            // 调用后端接口获取水质数据
+            fetch('/getWaterData')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch water data");
                     }
-                }
-            ]
-        });
+                    return response.json();
+                })
+                .then(data => {
+                    // 后端返回 [temperature, ph, dissolved_oxygen, conductivity, turbidity, permanganate_index]
+                    const [temperature, ph, dissolved_oxygen, conductivity, turbidity, permanganate_index] = data;
+        
+                    // 构造图表数据源
+                    const chartData = [
+                        ['score', 'series'],
+                        [ph, 'pH(无量纲)'],
+                        [dissolved_oxygen, '溶解氧(mg/L)'],
+                        [conductivity, '电导率(μS/cm)'],
+                        [turbidity, '浊度(NTU)'],
+                        [permanganate_index, '高锰酸盐指数(mg/L)'],
+						[temperature,'水温(℃)']
+                    ];
+        
+                    // 初始化图表
+                    initChart('chart3', {
+                        dataset: {
+                            source: chartData
+                        },
+                        grid: { containLabel: true },
+                        xAxis: {},
+                        yAxis: { type: 'category' },
+                        visualMap: {
+                            orient: 'horizontal',
+                            left: 'center',
+                            min: 0, // 根据实际数据范围调整
+                            max: 150, // 根据实际数据范围调整
+                            text: ['High Score', 'Low Score'],
+                            dimension: 0,
+                            inRange: {
+                                color: ['#65B581', '#FFCE34', '#FD665F']
+                            },
+							formatter: function (value) {
+							    return value.toFixed(2); // 格式化为两位小数
+							}
+                        },
+                        series: [
+                            {
+                                type: 'bar',
+                                encode: {
+                                    y: 'series',
+                                    x: 'score'
+                                }
+                            }
+                        ]
+                    });
+                })
+                .catch(error => {
+                    console.error("Error fetching water data:", error);
+                });
+        }
+        
+        // 调用函数生成图表
+        fetchWaterDataAndGenerateChart();
 
         // 环境分数计算
         initChart('chart4', {
