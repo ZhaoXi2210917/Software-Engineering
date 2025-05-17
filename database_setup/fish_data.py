@@ -6,7 +6,7 @@ import csv
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'nicaiyixia',
+    'password': '596289',
     'database': 'smart_ocean_ranch'
 }
 # 鱼类信息路径

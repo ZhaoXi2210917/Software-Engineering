@@ -14,7 +14,7 @@ X = data[['Species', 'Length1(cm)', 'Length2(cm)']]
 y = data['Length3(cm)']
 
 # 3. 特征编码
-encoder = OneHotEncoder(sparse=False)
+encoder = OneHotEncoder(sparse_output=False)
 X_encoded = encoder.fit_transform(X[['Species']])
 
 # 给 OneHotEncoder 的输出添加列名

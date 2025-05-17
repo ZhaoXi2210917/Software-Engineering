@@ -14,7 +14,7 @@ def insert_fake_data():
         connection = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="1973456zxc",
+            password="596289",
             database="smart_ocean_ranch"
         )
         cursor = connection.cursor()

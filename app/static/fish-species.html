@@ -17,43 +17,40 @@
 
     var option;
 
-    option = {
-      title: {
-        text: '鱼群种类统计',
-        left: 'center'
-      },
-      tooltip: {
-        trigger: 'item'
-      },
-      legend: {
-        orient: 'vertical',
-        left: 'left'
-      },
-      series: [
-        {
-          type: 'pie',
-          radius: '50%',
-          data: [
-            { value: 56, name: 'Perch' },
-            { value: 35, name: 'Bream' },
-            { value: 20, name: 'Roach' },
-            { value: 17, name: 'Pike' },
-            { value: 14, name: 'Smelt' },
-            { value: 11, name: 'Parkki' },
-            { value: 6, name: 'Whitefish' }
-          ],
-          emphasis: {
-            itemStyle: {
-              shadowBlur: 10,
-              shadowOffsetX: 0,
-              shadowColor: 'rgba(0, 0, 0, 0.5)'
+        // 从后端获取数据
+        fetch('/info') // 后端路由是 /info
+          .then(response => response.json()) // 将响应转换为 JSON 格式
+          .then(data => {
+            option = {
+              title: {
+                text: '鱼群种类统计',
+                left: 'center'
+              },
+              tooltip: {
+                trigger: 'item'
+              },
+              legend: {
+                orient: 'vertical',
+                left: 'left'
+              },
+              series: [
+                {
+                  type: 'pie',
+                  radius: '50%',
+                  data: data.species_data, // 使用从后端获取的数据
+                  emphasis: {
+                    itemStyle: {
+                      shadowBlur: 10,
+                      shadowOffsetX: 0,
+                      shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                  }
+                }
+              ]
             }
-          }
-        }
-      ]
-    };
+		};
 
-    if (option && typeof option === 'object') {
+	if (option && typeof option === 'object') {
       myChart.setOption(option);
     }
 

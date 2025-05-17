@@ -143,413 +143,422 @@
     </div>
 
     <script>
-            // 通用图表初始化函数
-            function initChart(domId, option) {
-                const chart = echarts.init(document.getElementById(domId));
-                chart.setOption(option);
-                window.addEventListener('resize', () => chart.resize());
-                return chart;
-            }
-            // 鱼群种类饼图
-            initChart('chart1',{
-                    title: { text: '鱼群种类统计', left: 'center' },
-                    tooltip: { trigger: 'item' },
-                    legend: { orient: 'vertical', left: 'left' },
-                    series: [{
-                        type: 'pie',
-                        radius: '50%',
-                        data: {{species_data|tojson}}
-                    }]
+        // 通用图表初始化函数
+        function initChart(domId, option) {
+            const chart = echarts.init(document.getElementById(domId));
+            chart.setOption(option);
+            window.addEventListener('resize', () => chart.resize());
+            return chart;
+        }
+
+        // 鱼群种类饼图
+        initChart('chart1', {
+            title: { text: '鱼群种类统计', left: 'center' },
+            tooltip: { trigger: 'item' },
+            legend: { orient: 'vertical', left: 'left' },
+            series: [{
+                type: 'pie',
+                radius: '50%',
+                data: {{species_data|tojson}}
+            }]
+        });
+
+        // 温度+降雨图
+        initChart('chart2', {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    crossStyle: {
+                        color: '#999'
+                    }
+                }
+            },
+            toolbox: {},
+            legend: {
+                data: ['蒸发量', '降雨量', '温度']
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    name: '降雨量',
+                    min: 0,
+                    max: 250,
+                    interval: 50,
+                    axisLabel: {
+                        formatter: '{value} ml'
+                    }
+                },
+                {
+                    type: 'value',
+                    name: '温度',
+                    min: 0,
+                    max: 25,
+                    interval: 5,
+                    axisLabel: {
+                        formatter: '{value} °C'
+                    }
+                }
+            ],
+            series: [
+                {
+                    name: '蒸发量',
+                    type: 'bar',
+                    tooltip: {
+                        valueFormatter: function (value) {
+                            return value + ' ml';
+                        }
+                    },
+                    data: [
+                        2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3
+                    ]
+                },
+                {
+                    name: '降雨量',
+                    type: 'bar',
+                    tooltip: {
+                        valueFormatter: function (value) {
+                            return value + ' ml';
+                        }
+                    },
+                    data: [
+                        2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3
+                    ]
+                },
+                {
+                    name: '温度',
+                    type: 'line',
+                    yAxisIndex: 1,
+                    tooltip: {
+                        valueFormatter: function (value) {
+                            return value + ' °C';
+                        }
+                    },
+                    data: [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
+                }
+            ]
+        });
+
+        // 水质环境指标
+        initChart('chart3', {
+            dataset: {
+                source: [
+                    ['score', 'series'],
+                    [55, 'pH(无量纲)'],
+                    [40, '溶解氧(mg/L)'],
+                    [88.9, '电导率(μS/cm)'],
+                    [67.8, '浊度(NTU)'],
+                    [55, '高锰酸盐指数(mg/L)'],
+                    [76, '氨氮(mg/L)'],
+                    [68, '总磷(mg/L)'],
+                    [48, '总氮(mg/L)']
+                ]
+            },
+            grid: { containLabel: true },
+            xAxis: {},
+            yAxis: { type: 'category' },
+            visualMap: {
+                orient: 'horizontal',
+                left: 'center',
+                min: 10,
+                max: 100,
+                text: ['High Score', 'Low Score'],
+                dimension: 0,
+                inRange: {
+                    color: ['#65B581', '#FFCE34', '#FD665F']
+                }
+            },
+            series: [
+                {
+                    type: 'bar',
+                    encode: {
+                        y: 'product',
+                    }
+                }
+            ]
+        });
+
+        // 环境分数计算
+        initChart('chart4', {
+            series: [
+                {
+                    type: 'gauge',
+                    startAngle: 180,
+                    endAngle: 0,
+                    center: ['50%', '75%'],
+                    radius: '90%',
+                    min: 0,
+                    max: 1,
+                    splitNumber: 8,
+                    axisLine: {
+                        lineStyle: {
+                            width: 6,
+                            color: [
+                                [0.25, '#FF6E76'],
+                                [0.5, '#FDDD60'],
+                                [0.75, '#58D9F9'],
+                                [1, '#7CFFB2']
+                            ]
+                        }
+                    },
+                    pointer: {
+                        icon: 'path://M12.8,0.7l12,40.1H0.7L12.8,0.7z',
+                        length: '12%',
+                        width: 20,
+                        offsetCenter: [0, '-60%'],
+                        itemStyle: {
+                            color: 'auto'
+                        }
+                    },
+                    axisTick: {
+                        length: 12,
+                        lineStyle: {
+                            color: 'auto',
+                            width: 2
+                        }
+                    },
+                    splitLine: {
+                        length: 20,
+                        lineStyle: {
+                            color: 'auto',
+                            width: 5
+                        }
+                    },
+                    axisLabel: {
+                        color: '#464646',
+                        fontSize: 20,
+                        distance: -60,
+                        rotate: 'tangential',
+                        formatter: function (value) {
+                            if (value === 0.875) {
+                                return '舒适';
+                            } else if (value === 0.625) {
+                                return '正常';
+                            } else if (value === 0.375) {
+                                return '隐患';
+                            } else if (value === 0.125) {
+                                return '危险';
+                            }
+                            return '';
+                        }
+                    },
+                    title: {
+                        offsetCenter: [0, '-10%'],
+                        fontSize: 20
+                    },
+                    detail: {
+                        fontSize: 30,
+                        offsetCenter: [0, '-35%'],
+                        valueAnimation: true,
+                        formatter: function (value) {
+                            return Math.round(value * 100) + '';
+                        },
+                        color: 'inherit'
+                    },
+                    data: [
+                        {
+                            value: 0.68,
+                            name: '环境得分'
+                        }
+                    ]
+                }
+            ]
+        });
+
+        // 动态图表配置
+        let currentDataType = 'weight';
+        let currentSpecies = 'all';
+        let dynamicChart = echarts.init(document.getElementById('dynamicChart'));
+
+        // 获取 X 轴范围数据
+        function getXAxisRanges(type) {
+            const ranges = {
+                weight: ['0-50kg', '50-100kg', '100-150kg', '150-200kg', '200-250kg', '250-300kg', '>300kg'],
+                length: ['0-20cm', '20-40cm', '40-60cm', '60-80cm', '80-100cm', '100-120cm', '>120cm'],
+                width: ['0-10cm', '10-20cm', '20-30cm', '30-40cm', '40-50cm', '50-60cm', '>60cm']
+            };
+            return ranges[type] || [];
+        }
+
+        // 获取 Y 轴单位
+        function getYAxisUnit(type) {
+            return {
+                weight: '(kg)',
+                length: '(cm)',
+                width: '(cm)'
+            }[type] || '';
+        }
+
+        // 获取数据
+        function fetchData(type, species) {
+            return new Promise((resolve, reject) => {
+                const url = `/get${type}?species=${species}`;
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => resolve(data))
+                    .catch(error => reject(error));
             });
-            // 温度+降雨图
-            initChart('chart2',{
-  tooltip: {
-    trigger: 'axis',
-    axisPointer: {
-      type: 'cross',
-      crossStyle: {
-        color: '#999'
-      }
-    }
-  },
-  toolbox: {
-
-  },
-  legend: {
-    data: ['蒸发量', '降雨量', '温度']
-  },
-  xAxis: [
-    {
-      type: 'category',
-      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-      axisPointer: {
-        type: 'shadow'
-      }
-    }
-  ],
-  yAxis: [
-    {
-      type: 'value',
-      name: '降雨量',
-      min: 0,
-      max: 250,
-      interval: 50,
-      axisLabel: {
-        formatter: '{value} ml'
-      }
-    },
-    {
-      type: 'value',
-      name: '温度',
-      min: 0,
-      max: 25,
-      interval: 5,
-      axisLabel: {
-        formatter: '{value} °C'
-      }
-    }
-  ],
-  series: [
-    {
-      name: '蒸发量',
-      type: 'bar',
-      tooltip: {
-        valueFormatter: function (value) {
-          return value + ' ml';
         }
-      },
-      data: [
-        2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3
-      ]
-    },
-    {
-      name: '降雨量',
-      type: 'bar',
-      tooltip: {
-        valueFormatter: function (value) {
-          return value + ' ml';
-        }
-      },
-      data: [
-        2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3
-      ]
-    },
-    {
-      name: '温度',
-      type: 'line',
-      yAxisIndex: 1,
-      tooltip: {
-        valueFormatter: function (value) {
-          return value + ' °C';
-        }
-      },
-      data: [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
-    }
-  ]
-});
 
-
-            // 水质环境指标
-            initChart('chart3',{
-  dataset: {
-    source: [
-      ['score', 'series'],
-      [55,'pH(无量纲)'],
-      [40, '溶解氧(mg/L)'],
-      [88.9, '电导率(μS/cm)'],
-      [67.8,  '浊度(NTU)'],
-      [55,  '高锰酸盐指数(mg/L)'],
-      [76, '氨氮(mg/L)'],
-      [68,  '总磷(mg/L)'],
-      [48,'总氮(mg/L)']
-    ]
-  },
-  grid: { containLabel: true },
-  xAxis: {},
-  yAxis: { type: 'category' },
-  visualMap: {
-    orient: 'horizontal',
-    left: 'center',
-    min: 10,
-    max: 100,
-    text: ['High Score', 'Low Score'],
-    // Map the score column to color
-    dimension: 0,
-    inRange: {
-      color: ['#65B581', '#FFCE34', '#FD665F']
-    }
-  },
-  series: [
-    {
-      type: 'bar',
-      encode: {
-        // Map the "amount" column to X axis.
-        // Map the "product" column to Y axis
-        y: 'product',
-      }
-    }
-  ]
-});
-
-            // 环境分数计算
-            initChart('chart4',{
-  series: [
-    {
-      type: 'gauge',
-      startAngle: 180,
-      endAngle: 0,
-      center: ['50%', '75%'],
-      radius: '90%',
-      min: 0,
-      max: 1,
-      splitNumber: 8,
-      axisLine: {
-        lineStyle: {
-          width: 6,
-          color: [
-            [0.25, '#FF6E76'],
-            [0.5, '#FDDD60'],
-            [0.75, '#58D9F9'],
-            [1, '#7CFFB2']
-          ]
-        }
-      },
-      pointer: {
-        icon: 'path://M12.8,0.7l12,40.1H0.7L12.8,0.7z',
-        length: '12%',
-        width: 20,
-        offsetCenter: [0, '-60%'],
-        itemStyle: {
-          color: 'auto'
-        }
-      },
-      axisTick: {
-        length: 12,
-        lineStyle: {
-          color: 'auto',
-          width: 2
-        }
-      },
-      splitLine: {
-        length: 20,
-        lineStyle: {
-          color: 'auto',
-          width: 5
-        }
-      },
-      axisLabel: {
-        color: '#464646',
-        fontSize: 20,
-        distance: -60,
-        rotate: 'tangential',
-        formatter: function (value) {
-          if (value === 0.875) {
-            return '舒适';
-          } else if (value === 0.625) {
-            return '正常';
-          } else if (value === 0.375) {
-            return '隐患';
-          } else if (value === 0.125) {
-            return '危险';
-          }
-          return '';
-        }
-      },
-      title: {
-        offsetCenter: [0, '-10%'],
-        fontSize: 20
-      },
-      detail: {
-        fontSize: 30,
-        offsetCenter: [0, '-35%'],
-        valueAnimation: true,
-        formatter: function (value) {
-          return Math.round(value * 100) + '';
-        },
-        color: 'inherit'
-      },
-      data: [
-        {
-          value: 0.68,
-          name: '环境得分'
-        }
-      ]
-    }
-  ]
-});
-
-// 动态图表配置
-let currentDataType = 'weight';
-let currentSpecies = 'all';
-let dynamicChart = echarts.init(document.getElementById('dynamicChart'));
-
-// 模拟数据（实际应从后端获取）
-const mockData = {
-    weight: {
-        all: [12, 15, 9, 18, 7, 5, 8],
-        Perch: [15, 18, 12, 20, 10, 7, 9],
-        Bream: [8, 12, 10, 15, 9, 6, 4],
-        Roach: [5, 7, 6, 9, 4, 3, 2],
-        Pike: [10, 14, 11, 16, 8, 7, 5],
-        Smelt: [3, 4, 2, 5, 2, 1, 1],
-        Parkki: [2, 3, 1, 4, 1, 0, 0],
-        Whitefish: [6, 8, 7, 10, 5, 4, 3]
-    },
-    length: {
-        all: [30, 35, 28, 40, 25, 22, 18],
-        Perch: [10, 14, 11, 16, 8, 7, 5],
-        Bream: [5, 7, 6, 9, 4, 3, 2],
-        Roach: [2, 3, 1, 4, 1, 0, 0],
-        Pike: [8, 12, 10, 15, 9, 6, 4],
-        Smelt: [3, 4, 2, 5, 2, 1, 1],
-        Parkki: [15, 18, 12, 20, 10, 7, 9],
-        Whitefish: [6, 8, 7, 10, 5, 4, 3]
-    },
-    width: {
-        all: [15, 18, 12, 20, 10, 8, 9],
-        Perch: [3, 4, 2, 5, 2, 1, 1],
-        Bream: [2, 3, 1, 4, 1, 0, 0],
-        Roach: [5, 7, 6, 9, 4, 3, 2],
-        Pike: [10, 14, 11, 16, 8, 7, 5],
-        Smelt: [8, 12, 10, 15, 9, 6, 4],
-        Parkki: [15, 18, 12, 20, 10, 7, 9],
-        Whitefish: [6, 8, 7, 10, 5, 4, 3]
-    }
-};
-
-// 获取 X 轴范围数据
-function getXAxisRanges(type) {
-    const ranges = {
-        weight: ['0-50kg', '50-100kg', '100-150kg', '150-200kg', '200-250kg', '250-300kg', '>300kg'],
-        length: ['0-20cm', '20-40cm', '40-60cm', '60-80cm', '80-100cm', '100-120cm', '>120cm'],
-        width: ['0-10cm', '10-20cm', '20-30cm', '30-40cm', '40-50cm', '50-60cm', '>60cm']
-    };
-    return ranges[type] || [];
-}
-
-// 获取 Y 轴单位
-function getYAxisUnit(type) {
-    return {
-        weight: '(kg)',
-        length: '(cm)',
-        width: '(cm)'
-    }[type] || '';
-}
-
-// 更新图表函数
-function updateDynamicChart() {
-    const option = {
-        title: {
-            text: `${currentSpecies === 'all' ? '全部' : currentSpecies}鱼类分布 - ${getTypeLabel(currentDataType)}`,
-            left: 'center',
-            textStyle: {
-                fontSize: 18,
-                color: '#333'
+        // 更新图表函数
+        async function updateDynamicChart() {
+            try {
+                // 获取原始数据
+                const rawData = await fetchData(currentDataType, currentSpecies);
+                // 获取X轴范围
+                const ranges = getXAxisRanges(currentDataType);
+        
+                // 初始化统计结果数组
+                const rangeCounts = new Array(ranges.length).fill(0);
+        
+                // 根据范围统计数据
+                rawData.forEach(value => {
+                    const numericValue = parseFloat(value);
+                    ranges.forEach((range, index) => {
+                        let min, max;
+                        if (range.startsWith('>')) {
+                            // 处理无上限范围，如 '>300kg'
+                            min = parseFloat(range.slice(1)); // 去掉 '>' 符号
+                            max = Infinity;
+                        } else {
+                            // 处理普通范围，如 '0-50kg'
+                            const [minStr, maxStr] = range.split('-');
+                            min = parseFloat(minStr);
+                            max = parseFloat(maxStr);
+                        }
+                        if (numericValue >= min && numericValue < max) {
+                            rangeCounts[index]++;
+                        }
+                    });
+                });
+        
+                // 构建图表配置
+                const option = {
+                    title: {
+                        text: `${currentSpecies === 'all' ? '全部' : currentSpecies}鱼类分布 - ${getTypeLabel(currentDataType)}`,
+                        left: 'center',
+                        textStyle: {
+                            fontSize: 18,
+                            color: '#333'
+                        }
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        formatter: function (params) {
+                            return `${params[0].marker} ${params[0].seriesName}<br/>
+                                    ${params[0].axisValue}: ${params[0].data}条`;
+                        }
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: ranges,
+                        axisLabel: {
+                            rotate: 45,
+                            interval: 0
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                color: '#666'
+                            }
+                        }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        name: `数量 ${getYAxisUnit(currentDataType)}`,
+                        nameTextStyle: {
+                            color: '#666',
+                            padding: [0, 0, 0, 20]
+                        },
+                        splitLine: {
+                            show: true,
+                            lineStyle: {
+                                type: 'dashed'
+                            }
+                        }
+                    },
+                    series: [{
+                        name: '数量分布',
+                        type: 'line',
+                        smooth: true,
+                        symbol: 'circle',
+                        symbolSize: 8,
+                        lineStyle: {
+                            color: '#00796b',
+                            width: 3
+                        },
+                        itemStyle: {
+                            color: '#00796b',
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                offset: 0,
+                                color: 'rgba(0,121,107,0.3)'
+                            }, {
+                                offset: 1,
+                                color: 'rgba(0,121,107,0.01)'
+                            }])
+                        },
+                        data: rangeCounts // 使用统计结果作为数据
+                    }],
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '15%',
+                        containLabel: true
+                    }
+                };
+        
+                // 更新图表
+                dynamicChart.setOption(option);
+            } catch (error) {
+                console.error('Error fetching or processing data:', error);
             }
-        },
-        tooltip: {
-            trigger: 'axis',
-            formatter: function(params) {
-                return `${params[0].marker} ${params[0].seriesName}<br/>
-                        ${params[0].axisValue}: ${params[0].data}条`;
-            }
-        },
-        xAxis: {
-            type: 'category',
-            data: getXAxisRanges(currentDataType),
-            axisLabel: {
-                rotate: 45,
-                interval: 0
-            },
-            axisLine: {
-                lineStyle: {
-                    color: '#666'
+        }
+
+        // 按钮点击处理
+        document.querySelectorAll('.chart-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                if (this.dataset.type) {
+                    document.querySelectorAll('[data-type]').forEach(b =>
+                        b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentDataType = this.dataset.type;
                 }
-            }
-        },
-        yAxis: {
-            type: 'value',
-            name: `数量 ${getYAxisUnit(currentDataType)}`,
-            nameTextStyle: {
-                color: '#666',
-                padding: [0, 0, 0, 20]
-            },
-            splitLine: {
-                show: true,
-                lineStyle: {
-                    type: 'dashed'
+
+                if (this.dataset.species) {
+                    document.querySelectorAll('[data-species]').forEach(b =>
+                        b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentSpecies = this.dataset.species;
                 }
-            }
-        },
-        series: [{
-            name: '数量分布',
-            type: 'line',
-            smooth: true,
-            symbol: 'circle',
-            symbolSize: 8,
-            lineStyle: {
-                color: '#00796b',
-                width: 3
-            },
-            itemStyle: {
-                color: '#00796b',
-                borderColor: '#fff',
-                borderWidth: 2
-            },
-            areaStyle: {
-                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                    offset: 0,
-                    color: 'rgba(0,121,107,0.3)'
-                }, {
-                    offset: 1,
-                    color: 'rgba(0,121,107,0.01)'
-                }])
-            },
-            data: mockData[currentDataType][currentSpecies]
-        }],
-        grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '15%',
-            containLabel: true
-        }
-    };
-    dynamicChart.setOption(option);
-}
 
-// 按钮点击处理（保持不变）
-document.querySelectorAll('.chart-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        if (this.dataset.type) {
-            document.querySelectorAll('[data-type]').forEach(b =>
-                b.classList.remove('active'));
-            this.classList.add('active');
-            currentDataType = this.dataset.type;
+                updateDynamicChart();
+            });
+        });
+
+        // 类型标签转换
+        function getTypeLabel(type) {
+            return {
+                weight: '重量分布',
+                length: '长度分布',
+                width: '宽度分布'
+            }[type];
         }
 
-        if (this.dataset.species) {
-            document.querySelectorAll('[data-species]').forEach(b =>
-                b.classList.remove('active'));
-            this.classList.add('active');
-            currentSpecies = this.dataset.species;
-        }
-
+        // 初始化图表
         updateDynamicChart();
-    });
-});
-
-// 类型标签转换
-function getTypeLabel(type) {
-    return {
-        weight: '重量分布',
-        length: '长度分布',
-        width: '宽度分布'
-    }[type];
-}
-
-// 初始化图表
-updateDynamicChart();
-window.addEventListener('resize', () => dynamicChart.resize());
+        window.addEventListener('resize', () => dynamicChart.resize());
     </script>
 </body>
 
