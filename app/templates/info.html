@@ -272,67 +272,6 @@
         generateChart(cityAdcode, apiKey);
 
         // 水质环境指标
-        // function fetchWaterDataAndGenerateChart() {
-        //     // 调用后端接口获取水质数据
-        //     fetch('/getWaterData')
-        //         .then(response => {
-        //             if (!response.ok) {
-        //                 throw new Error("Failed to fetch water data");
-        //             }
-        //             return response.json();
-        //         })
-        //         .then(data => {
-        //             // 后端返回 [temperature, ph, dissolved_oxygen, conductivity, turbidity, permanganate_index]
-        //             const [temperature, ph, dissolved_oxygen, conductivity, turbidity, permanganate_index] = data;
-
-        //             // 构造图表数据源
-        //             const chartData = [
-        //                 ['score', 'series'],
-        //                 [ph, 'pH(无量纲)'],
-        //                 [dissolved_oxygen, '溶解氧(mg/L)'],
-        //                 [conductivity, '电导率(μS/cm)'],
-        //                 [turbidity, '浊度(NTU)'],
-        //                 [permanganate_index, '高锰酸盐指数(mg/L)'],
-        //                 [temperature, '水温(℃)']
-        //             ];
-
-        //             // 初始化图表
-        //             initChart('chart3', {
-        //                 dataset: {
-        //                     source: chartData
-        //                 },
-        //                 grid: { containLabel: true },
-        //                 xAxis: {},
-        //                 yAxis: { type: 'category' },
-        //                 visualMap: {
-        //                     orient: 'horizontal',
-        //                     left: 'center',
-        //                     min: 0, // 根据实际数据范围调整
-        //                     max: 150, // 根据实际数据范围调整
-        //                     text: ['High Score', 'Low Score'],
-        //                     dimension: 0,
-        //                     inRange: {
-        //                         color: ['#65B581', '#FFCE34', '#FD665F']
-        //                     },
-        //                     formatter: function (value) {
-        //                         return value.toFixed(2); // 格式化为两位小数
-        //                     }
-        //                 },
-        //                 series: [
-        //                     {
-        //                         type: 'bar',
-        //                         encode: {
-        //                             y: 'series',
-        //                             x: 'score'
-        //                         }
-        //                     }
-        //                 ]
-        //             });
-        //         })
-        //         .catch(error => {
-        //             console.error("Error fetching water data:", error);
-        //         });
-        // }
         function fetchWaterDataAndGenerateChart() {
             fetch('/getWaterData')
                 .then(response => {
