@@ -6,7 +6,7 @@ from datetime import datetime
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': '596289',
+    'password': 'Mqx20041205',
     'database': 'smart_ocean_ranch'
 }
 # 水质信息路径

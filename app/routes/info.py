@@ -143,6 +143,7 @@ def get_water_data():
 
     return ordered_data
 
+# 养殖趋势
 @bp.route('/trend')
 def trend_page():
     return render_template('trend_analysis.html')
