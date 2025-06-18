@@ -7,7 +7,8 @@ import io
 
 # 加载 .env 文件
 load_dotenv()
-api_key=os.environ.get("MOONSHOT_API_KEY")
+# api_key=os.environ.get("MOONSHOT_API_KEY")
+api_key = "sk-2upVbwbgl0wpefMXcBAERr7FibKniMqZL5664p09mwn7fQYb"
 
 client = OpenAI(
     api_key=api_key,

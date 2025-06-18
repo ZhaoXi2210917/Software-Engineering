@@ -5,7 +5,8 @@ from dotenv import load_dotenv
 # 加载 .env 文件
 load_dotenv()
 # 从环境变量中获取 API Key
-api_key = os.environ.get("MOONSHOT_API_KEY")
+# api_key = os.environ.get("MOONSHOT_API_KEY")
+api_key = "sk-2upVbwbgl0wpefMXcBAERr7FibKniMqZL5664p09mwn7fQYb"
 if not api_key:
     raise ValueError("环境变量 MOONSHOT_API_KEY 未设置！")
 

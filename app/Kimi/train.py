@@ -7,7 +7,7 @@ import joblib
 import os
 
 # 1. 加载数据
-data = pd.read_csv('data/Fish.csv')
+data = pd.read_csv('data\Fish.csv')
 
 # 2. 数据预处理
 X = data[['Species', 'Length1(cm)', 'Length2(cm)']]
