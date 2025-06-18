@@ -1,33 +1,120 @@
-<!-- trend_analysis.html -->
+<!-- templates/trend_analysis.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>养殖趋势预测</title>
-    <link rel="stylesheet" href="styles.css">
-    <script>
-        async function loadContent(url, elementId) {
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error("数据加载失败");
-                const data = await response.json();
-                document.getElementById(elementId).innerHTML = JSON.stringify(data, null, 2);
-            } catch (error) {
-                console.error("Error loading content: ", error);
-                document.getElementById(elementId).innerHTML = "加载失败，请稍后重试。";
-            }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 引入 Bootstrap（可选） -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- 引入 Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f5f8fa;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         }
-    </script>
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2, h3 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #suggestions {
+            background-color: #e7f4ea;
+            border-left: 5px solid #28a745;
+            padding: 15px;
+            font-size: 1.1em;
+            color: #155724;
+        }
+    </style>
 </head>
 <body>
-    <div class="smart-center-content">
+    <div class="container">
         <h2>养殖趋势预测</h2>
-        <div id="trendData">加载数据中...</div>
+        <canvas id="trendChart" style="width: 100%; height: 300px;"></canvas>
+
+        <h3>养殖建议</h3>
+        <div id="suggestions">加载建议中...</div>
     </div>
+
     <script>
-        window.onload = function() {
-            loadContent('/api/trend_data', 'trendData');
+        async function loadTrendData() {
+            try {
+                const res = await fetch('/api/trend_data');
+                const data = await res.json();
+
+                const ctx = document.getElementById('trendChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.timestamps,
+                        datasets: [{
+                            label: '预测体重 (kg)',
+                            data: data.values,
+                            borderColor: '#007bff',
+                            backgroundColor: 'rgba(0,123,255,0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                title: {
+                                    display: true,
+                                    text: '体重 (kg)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: '日期'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        }
+                    }
+                });
+            } catch (err) {
+                console.error("趋势图加载失败", err);
+                document.getElementById('trendChart').outerHTML = '<p style="color:red;">趋势图加载失败</p>';
+            }
+        }
+
+        async function loadSuggestions() {
+            try {
+                const res = await fetch('/api/suggestions');
+                const data = await res.json();
+                document.getElementById('suggestions').innerText = data.suggestion;
+            } catch (err) {
+                console.error("建议加载失败", err);
+                document.getElementById('suggestions').innerText = "建议加载失败";
+            }
+        }
+
+        window.onload = function () {
+            console.log("页面加载成功");
+            loadTrendData();
+            loadSuggestions();
         };
     </script>
 </body>

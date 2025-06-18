@@ -10,6 +10,9 @@ from app.routes.info import bp as info_bp   # 主要信息蓝图
 from app.routes.underwater import bp as underwater_bp   # 水下系统蓝图
 from app.routes.smartcenter import bp as smartcenter_bp # 智能中心蓝图
 from app.routes.datacenter import bp as datacenter_bp   # 数据中心蓝图
+from app.routes.trend import bp as trend_bp  # 养殖趋势蓝图
+
+
 
 def create_app():
     app = Flask(__name__)
@@ -25,5 +28,6 @@ def create_app():
     app.register_blueprint(underwater_bp)
     app.register_blueprint(smartcenter_bp)
     app.register_blueprint(datacenter_bp)
+    app.register_blueprint(trend_bp)
     
     return app

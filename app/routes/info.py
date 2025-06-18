@@ -142,6 +142,10 @@ def get_water_data():
     ]
 
     return ordered_data
+
+@bp.route('/trend')
+def trend_page():
+    return render_template('trend_analysis.html')
 # 主要信息
 @bp.route('/info')
 def info():
