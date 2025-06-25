@@ -106,7 +106,7 @@
 
     <script>
     function loadContent(route) {
-        fetch(`/user/${route}`) // 调用 Flask 的 API 路由
+        fetch(`${route}`) // 调用 Flask 的 API 路由
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);

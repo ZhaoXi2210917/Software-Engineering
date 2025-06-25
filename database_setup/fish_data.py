@@ -1,14 +1,10 @@
 import mysql.connector
 import os
 import csv
+from config import DB_CONFIG  # 从 config.py 导入数据库配置
 
 # 数据库连接配置
-db_config = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': 'Mqx20041205',
-    'database': 'smart_ocean_ranch'
-}
+db_config = DB_CONFIG
 # 鱼类信息路径
 file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "Fish.csv")
 

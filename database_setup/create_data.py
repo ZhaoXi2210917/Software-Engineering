@@ -1,6 +1,8 @@
 from faker import Faker
 import mysql.connector
 import random
+from config import DB_CONFIG  # 从 config.py 导入数据库配置
+
 
 def insert_fake_data():
     # 初始化 Faker
@@ -12,11 +14,11 @@ def insert_fake_data():
     try:
         # 连接到数据库
         connection = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="596289",
-            database="smart_ocean_ranch"
-        )
+    host=DB_CONFIG["host"],
+    user=DB_CONFIG["user"],
+    password=DB_CONFIG["password"],
+    database=DB_CONFIG["database"]
+)
         cursor = connection.cursor()
 
         # 1. 插入用户数据 (使用整合后的users表)

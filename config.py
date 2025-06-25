@@ -2,7 +2,7 @@
 
 DB_CONFIG = {
     "host": "localhost",
-    "user": "root",
-    "password": "Mqx20041205",
+    "user": "111",
+    "password": "20040805ZXzx",
     "database": "smart_ocean_ranch"
 }

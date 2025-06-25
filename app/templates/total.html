@@ -62,7 +62,9 @@
             <div class="stat-box" id="eventTotal">系统事件: 0</div>
             <div class="stat-box" id="errorTotal">错误报告: 0</div>
         </div>
-
+    <button id="exportBtn" style="margin: 20px; padding: 10px 20px; background-color: #00796b; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        导出数据
+    </button>
         <div class="chart-container">
             <h3>数据总量分布图</h3>
             <canvas id="doughnutChart" width="600" height="400"></canvas>
@@ -129,7 +131,33 @@
                 }
             });
         }
+    document.getElementById("exportBtn").addEventListener("click", exportData);
 
+function exportData() {
+    const data = {
+        userTotal: document.getElementById("userTotal").innerText.split(': ')[1],
+        transactionTotal: document.getElementById("transactionTotal").innerText.split(': ')[1],
+        logTotal: document.getElementById("logTotal").innerText.split(': ')[1],
+        eventTotal: document.getElementById("eventTotal").innerText.split(': ')[1],
+        errorTotal: document.getElementById("errorTotal").innerText.split(': ')[1]
+    };
+
+    // 将数据转换为 CSV 格式
+    const csvContent = "数据类型,数量\n" + 
+        Object.keys(data).map(key => `${key},${data[key]}`).join("\n");
+
+    // 创建 Blob 对象并下载文件
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    if (link.download !== undefined) { // 支持下载的浏览器
+        link.setAttribute('href', URL.createObjectURL(blob));
+        link.setAttribute('download', '数据总量统计.csv');
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
         // 页面加载时获取数据
         document.addEventListener("DOMContentLoaded", fetchData);
     </script>
