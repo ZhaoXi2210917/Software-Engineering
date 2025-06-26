@@ -96,11 +96,14 @@
 
         <div class="chart-container">
             <h3>未来几天的温差</h3>
-            <canvas id="temperatureDifferenceChart" width="600" height="400"></canvas>
+            <canvas id="temperatureDifferenceChart" width="400" height="300"></canvas>
         </div>
 
-        <!-- 下载按钮 -->
+        <!-- 下载温差图按钮 -->
         <button class="download-btn" id="downloadBtn">下载温差图</button>
+
+        <!-- 导出温差数据按钮 -->
+        <button class="download-btn" id="downloadCsvBtn">导出温差数据 (CSV)</button>
 
         <!-- 控制选项 -->
         <div class="control-section">
@@ -124,10 +127,13 @@
         </div>
 
         <!-- 动态图表容器 -->
-        <div id="dynamicChart" style="width: 100%; height: 400px;"></div>
+        <div id="dynamicChart" style="width: 100%; height: 400px; margin: 0 auto;"></div>
 
-        <!-- 下载按钮 -->
+        <!-- 下载动态图表按钮 -->
         <button class="download-btn" id="downloadDynamicChartBtn">下载动态图表</button>
+
+        <!-- 导出动态图表数据按钮 -->
+        <button class="download-btn" id="downloadDynamicChartCsvBtn">导出动态图表数据 (CSV)</button>
 
         <!-- 上传信息部分 -->
         <div class="upload-section">
@@ -141,16 +147,49 @@
     </div>
 
     <script>
+        // 假设从后端获取的数据
+        const fetchDataFromDatabase = async () => {
+            return [
+                { date: '2025-06-27', temperatureDifference: 7 },
+                { date: '2025-06-28', temperatureDifference: 6 },
+                { date: '2025-06-29', temperatureDifference: 8 },
+                { date: '2025-06-30', temperatureDifference: 7 }
+            ];
+        };
+
+        // 生成CSV文件
+        function generateCSV(data) {
+            const header = ['日期', '温差 (°C)'];
+            const rows = data.map(item => [item.date, item.temperatureDifference]);
+
+            let csvContent = header.join(',') + '\n';
+            rows.forEach(row => {
+                csvContent += row.join(',') + '\n';
+            });
+
+            return csvContent;
+        }
+
+        // 温差图CSV导出
+        document.getElementById('downloadCsvBtn').addEventListener('click', async function () {
+            try {
+                const data = await fetchDataFromDatabase();
+                const csvContent = generateCSV(data);
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'weather_data.csv';
+                link.click();
+            } catch (error) {
+                console.error('导出数据失败:', error);
+            }
+        });
+
         // 获取高德地图天气数据
         function fetchWeatherData(cityAdcode, key) {
             return new Promise((resolve, reject) => {
                 fetch(`https://restapi.amap.com/v3/weather/weatherInfo?city=${cityAdcode}&extensions=all&key=${key}&output=json`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error("Network response was not ok");
-                        }
-                        return response.json();
-                    })
+                    .then(response => response.json())
                     .then(data => {
                         if (data.status === "1" && data.info === "OK") {
                             resolve(data);
@@ -158,9 +197,7 @@
                             reject(new Error("Failed to fetch weather data"));
                         }
                     })
-                    .catch(error => {
-                        reject(error);
-                    });
+                    .catch(error => reject(error));
             });
         }
 
@@ -169,7 +206,6 @@
             fetchWeatherData(cityAdcode, key)
                 .then(data => {
                     const forecasts = data.forecasts[0].casts;
-
                     const dates = forecasts.map(forecast => forecast.date);
                     const highs = forecasts.map(forecast => parseFloat(forecast.daytemp));
                     const lows = forecasts.map(forecast => parseFloat(forecast.nighttemp));
@@ -192,9 +228,7 @@
                         options: {
                             responsive: true,
                             plugins: {
-                                legend: {
-                                    position: 'top'
-                                },
+                                legend: { position: 'top' },
                                 title: {
                                     display: true,
                                     text: '未来几天的温差'
@@ -203,9 +237,7 @@
                             scales: {
                                 y: {
                                     beginAtZero: true,
-                                    ticks: {
-                                        stepSize: 1
-                                    }
+                                    ticks: { stepSize: 1 }
                                 }
                             }
                         }
@@ -228,8 +260,9 @@
         const apiKey = '8c3e8f0f8fdb5a0a99e2e7be9c28fb93';
         generateChart(cityAdcode, apiKey);
 
+        // 动态图表逻辑
         let currentDataType = 'weight';
-        let currentSpecies = 'Bream'; // Default to 'Bream'
+        let currentSpecies = 'Bream';
         let dynamicChart = echarts.init(document.getElementById('dynamicChart'));
 
         function getXAxisRanges(type) {
@@ -249,7 +282,7 @@
             }[type] || '';
         }
 
-        function fetchData(type, species) {
+        async function fetchData(type, species) {
             return new Promise((resolve, reject) => {
                 const url = `/get${type}?species=${species}`;
                 fetch(url)
@@ -263,7 +296,6 @@
             try {
                 const rawData = await fetchData(currentDataType, currentSpecies);
                 const ranges = getXAxisRanges(currentDataType);
-
                 const rangeCounts = new Array(ranges.length).fill(0);
 
                 rawData.forEach(value => {
@@ -361,10 +393,44 @@
                 };
 
                 dynamicChart.setOption(option);
+
+                // 下载动态图表CSV
+                document.getElementById('downloadDynamicChartCsvBtn').addEventListener('click', function () {
+                    const csvData = generateCSVFromChart(ranges, rangeCounts);
+                    downloadCSV(csvData);
+                });
+
+                // 下载动态图表图片
+                document.getElementById('downloadDynamicChartBtn').addEventListener('click', function () {
+                    const imageUrl = dynamicChart.getDataURL();
+                    const link = document.createElement('a');
+                    link.href = imageUrl;
+                    link.download = 'dynamic_chart.png';
+                    link.click();
+                });
+
             } catch (error) {
                 console.error('Error fetching or processing data:', error);
             }
         }
+
+        function generateCSVFromChart(labels, data) {
+            let csvContent = '分类,数量\n';
+            labels.forEach((label, index) => {
+                csvContent += `${label},${data[index]}\n`;
+            });
+            return csvContent;
+        }
+
+        function downloadCSV(csvData) {
+            const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'dynamic_chart_data.csv';
+            link.click();
+        }
+
+        updateDynamicChart();
 
         document.getElementById('parameterSelect').addEventListener('change', function () {
             currentDataType = this.value;
@@ -384,34 +450,6 @@
             }[type];
         }
 
-        updateDynamicChart();
-
-        // 上传信息模拟
-        document.getElementById('uploadBtn').addEventListener('click', function () {
-            const length = document.getElementById('length').value;
-            const width = document.getElementById('width').value;
-            const height = document.getElementById('height').value;
-            const name = document.getElementById('name').value;
-
-            if (length && width && height && name) {
-                alert("信息上传成功！\n" +
-                    `名称: ${name}\n` +
-                    `长度: ${length} cm\n` +
-                    `宽度: ${width} cm\n` +
-                    `高度: ${height} cm`);
-            } else {
-                alert("请完整填写所有信息！");
-            }
-        });
-
-        // 下载动态图表功能
-        document.getElementById('downloadDynamicChartBtn').addEventListener('click', function () {
-            const imageUrl = dynamicChart.getDataURL();
-            const link = document.createElement('a');
-            link.href = imageUrl;
-            link.download = 'dynamic_chart.png';
-            link.click();
-        });
     </script>
 
 </body>
