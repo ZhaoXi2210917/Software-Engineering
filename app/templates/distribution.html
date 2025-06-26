@@ -37,103 +37,104 @@
 <body>
 
     <div class="distribution-container">
-        <h2>数据中心分布</h2>
+        <h2>天津市天气数据 - 温度图</h2>
 
         <div class="chart-container">
-            <h3>模块数据分布</h3>
-            <canvas id="pieChart" width="600" height="400"></canvas>
-        </div>
-
-        <div class="chart-container">
-            <h3>模块数据雷达图</h3>
-            <canvas id="radarChart" width="600" height="400"></canvas>
+            <h3>未来几天的温度</h3>
+            <canvas id="temperatureChart" width="600" height="400"></canvas>
         </div>
     </div>
 
     <script>
-        const API_URL = "http://localhost:3000/api/distribution";
-
-        // 获取数据并渲染图表
-        async function fetchData() {
-            try {
-                const response = await fetch(API_URL);
-                const data = await response.json();
-
-                const labels = data.map(item => item.label);
-                const values = data.map(item => item.value);
-
-                // 渲染饼图
-                renderPieChart(labels, values);
-
-                // 渲染雷达图
-                renderRadarChart(labels, values);
-
-            } catch (error) {
-                console.error("数据加载失败：", error);
-            }
-        }
-
-        // 渲染饼图
-        function renderPieChart(labels, data) {
-            const ctx = document.getElementById('pieChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: '数据分布',
-                        data: data,
-                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
-                        hoverOffset: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        },
-                        title: {
-                            display: true,
-                            text: '模块数据分布图'
+        // 获取高德地图天气数据
+        function fetchWeatherData(cityAdcode, key) {
+            return new Promise((resolve, reject) => {
+                fetch(`https://restapi.amap.com/v3/weather/weatherInfo?city=${cityAdcode}&extensions=all&key=${key}&output=json`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Network response was not ok");
                         }
-                    }
-                }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.status === "1" && data.info === "OK") {
+                            resolve(data);
+                        } else {
+                            reject(new Error("Failed to fetch weather data"));
+                        }
+                    })
+                    .catch(error => {
+                        reject(error);
+                    });
             });
         }
 
-        // 渲染雷达图
-        function renderRadarChart(labels, data) {
-            const ctx = document.getElementById('radarChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: '模块数据',
-                        data: data,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: '#4BC0C0',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top'
+        // 处理天气数据并生成温度柱状图
+        function generateChart(cityAdcode, key) {
+            fetchWeatherData(cityAdcode, key)
+                .then(data => {
+                    // 获取未来几天的天气预报数据
+                    const forecasts = data.forecasts[0].casts;
+
+                    // 提取日期、最高温度和最低温度
+                    const dates = forecasts.map(forecast => forecast.date);
+                    const highs = forecasts.map(forecast => parseFloat(forecast.daytemp));
+                    const lows = forecasts.map(forecast => parseFloat(forecast.nighttemp));
+
+                    // 渲染温度柱状图
+                    const ctx = document.getElementById('temperatureChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: dates,
+                            datasets: [
+                                {
+                                    label: '最高温度 (°C)',
+                                    data: highs,
+                                    backgroundColor: '#FF6384',
+                                    borderColor: '#FF6384',
+                                    borderWidth: 1
+                                },
+                                {
+                                    label: '最低温度 (°C)',
+                                    data: lows,
+                                    backgroundColor: '#36A2EB',
+                                    borderColor: '#36A2EB',
+                                    borderWidth: 1
+                                }
+                            ]
                         },
-                        title: {
-                            display: true,
-                            text: '模块数据雷达图'
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'top'
+                                },
+                                title: {
+                                    display: true,
+                                    text: '未来几天的温度'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    }
+                                }
+                            }
                         }
-                    }
-                }
-            });
+                    });
+                })
+                .catch(error => {
+                    console.error("Error fetching weather data:", error);
+                });
         }
 
-        // 页面加载时获取数据
-        document.addEventListener("DOMContentLoaded", fetchData);
+        // 城市编码和高德地图 API Key
+        const cityAdcode = '120100'; // 天津市的 adcode
+        const apiKey = '8c3e8f0f8fdb5a0a99e2e7be9c28fb93';
+        generateChart(cityAdcode, apiKey);
     </script>
 
 </body>

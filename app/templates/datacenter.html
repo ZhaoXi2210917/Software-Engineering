@@ -4,125 +4,416 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>数据中心</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>天津市天气数据 - 温差图</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.2.2/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             background-color: #e0f7fa;
             font-family: 'Arial', sans-serif;
         }
 
-        .smart-center-content {
+        .distribution-container {
+            width: 80%;
+            margin: 0 auto;
             padding: 30px;
-            background-color: rgba(255, 255, 255, 0.8);
+            background-color: #ffffff;
             border-radius: 15px;
-            margin: 20px;
-            overflow-y: auto;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
             text-align: center;
         }
 
-        .smart-center-content h2 {
+        .distribution-container h2 {
             color: #00796b;
+            margin-bottom: 20px;
         }
 
-        .smart-center-content p {
-            color: #004d40;
+        .chart-container {
+            margin-bottom: 40px;
         }
 
-        .modules-container {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 20px;
+        .download-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #00796b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            background-color: #004d40;
+        }
+
+        .control-section {
+            margin-bottom: 20px;
+        }
+
+        .control-section select,
+        .control-section input {
+            margin: 5px;
+            padding: 10px;
+            background-color: #00796b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .control-section select:hover,
+        .control-section input:hover {
+            background-color: #004d40;
+        }
+
+        .upload-section {
             margin-top: 30px;
         }
 
-        .module {
-            background-color: #ffffff;
-            border: 1px solid #00796b;
-            border-radius: 10px;
-            padding: 20px;
-            width: 30%;
-            box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: transform 0.3s;
+        .upload-section input {
+            width: 200px;
         }
 
-        .module:hover {
-            transform: scale(1.05);
-        }
-
-        .module h3 {
-            color: #00796b;
-        }
-
-        .module p {
-            color: #004d40;
-        }
-
-        .custom-button {
-            background-color: #00796b;
-            color: #ffffff;
-            border: none;
+        .upload-section button {
             padding: 10px 20px;
+            background-color: #00796b;
+            color: white;
+            border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
 
-        .custom-button:hover {
+        .upload-section button:hover {
             background-color: #004d40;
         }
     </style>
 </head>
 
 <body>
-    <div class="smart-center-content">
-        <h2>数据中心</h2>
 
-        <div class="modules-container">
-            <!-- 数据库交互可视化页面模块 -->
-            <div class="module">
-                <h3>数据库交互可视化页面</h3>
-                <p>展示数据库中的各项数据，以图表和数据表的形式呈现。</p>
-                <button class="custom-button" onclick="loadContent('visualization')">查看详情</button>
-            </div>
+    <div class="distribution-container">
+        <h2>天津市天气数据 - 温差图</h2>
 
-            <!-- 数据中心分布模块 -->
-            <div class="module">
-                <h3>数据中心分布</h3>
-                <p>展示数据中心各模块的数据分布情况。</p>
-                <button class="custom-button" onclick="loadContent('distribution')">查看详情</button>
-            </div>
+        <div class="chart-container">
+            <h3>未来几天的温差</h3>
+            <canvas id="temperatureDifferenceChart" width="600" height="400"></canvas>
+        </div>
 
-            <!-- 数据总量模块 -->
-            <div class="module">
-                <h3>数据总量</h3>
-                <p>统计数据中心的总数据量，包括数据量、文件数量等。</p>
-                <button class="custom-button" onclick="loadContent('total')">查看详情</button>
-            </div>
+        <!-- 下载按钮 -->
+        <button class="download-btn" id="downloadBtn">下载温差图</button>
+
+        <!-- 控制选项 -->
+        <div class="control-section">
+            <label for="parameterSelect">选择参数:</label>
+            <select id="parameterSelect">
+                <option value="weight">重量</option>
+                <option value="length">长度</option>
+                <option value="width">宽度</option>
+            </select>
+
+            <label for="speciesSelect">选择种类:</label>
+            <select id="speciesSelect">
+                <option value="Bream">Bream</option>
+                <option value="Roach">Roach</option>
+                <option value="Whitefish">Whitefish</option>
+                <option value="Parkki">Parkki</option>
+                <option value="Perch">Perch</option>
+                <option value="Pike">Pike</option>
+                <option value="Smelt">Smelt</option>
+            </select>
+        </div>
+
+        <!-- 动态图表容器 -->
+        <div id="dynamicChart" style="width: 100%; height: 400px;"></div>
+
+        <!-- 下载按钮 -->
+        <button class="download-btn" id="downloadDynamicChartBtn">下载动态图表</button>
+
+        <!-- 上传信息部分 -->
+        <div class="upload-section">
+            <h3>上传信息</h3>
+            <input type="text" id="length" placeholder="输入长度 (cm)">
+            <input type="text" id="width" placeholder="输入宽度 (cm)">
+            <input type="text" id="height" placeholder="输入高度 (cm)">
+            <input type="text" id="name" placeholder="输入名称">
+            <button id="uploadBtn">上传信息</button>
         </div>
     </div>
 
     <script>
-    function loadContent(route) {
-        fetch(`${route}`) // 调用 Flask 的 API 路由
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.text();
-            })
-            .then(html => {
-                document.getElementById("content").innerHTML = html; // 插入返回的 HTML
-            })
-            .catch(error => console.error('Error loading content from Flask route:', error));
-    }
-
-        function logout() {
-            window.location.href = "/";
+        // 获取高德地图天气数据
+        function fetchWeatherData(cityAdcode, key) {
+            return new Promise((resolve, reject) => {
+                fetch(`https://restapi.amap.com/v3/weather/weatherInfo?city=${cityAdcode}&extensions=all&key=${key}&output=json`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Network response was not ok");
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.status === "1" && data.info === "OK") {
+                            resolve(data);
+                        } else {
+                            reject(new Error("Failed to fetch weather data"));
+                        }
+                    })
+                    .catch(error => {
+                        reject(error);
+                    });
+            });
         }
+
+        // 处理天气数据并生成温差图
+        function generateChart(cityAdcode, key) {
+            fetchWeatherData(cityAdcode, key)
+                .then(data => {
+                    const forecasts = data.forecasts[0].casts;
+
+                    const dates = forecasts.map(forecast => forecast.date);
+                    const highs = forecasts.map(forecast => parseFloat(forecast.daytemp));
+                    const lows = forecasts.map(forecast => parseFloat(forecast.nighttemp));
+
+                    const temperatureDifferences = highs.map((high, index) => high - lows[index]);
+
+                    const ctx = document.getElementById('temperatureDifferenceChart').getContext('2d');
+                    const chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: dates,
+                            datasets: [{
+                                label: '温差 (°C)',
+                                data: temperatureDifferences,
+                                backgroundColor: '#FF6384',
+                                borderColor: '#FF6384',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'top'
+                                },
+                                title: {
+                                    display: true,
+                                    text: '未来几天的温差'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    document.getElementById('downloadBtn').addEventListener('click', function () {
+                        const imageUrl = chart.toBase64Image();
+                        const link = document.createElement('a');
+                        link.href = imageUrl;
+                        link.download = 'temperature_difference_chart.png';
+                        link.click();
+                    });
+                })
+                .catch(error => {
+                    console.error("Error fetching weather data:", error);
+                });
+        }
+
+        const cityAdcode = '120100';
+        const apiKey = '8c3e8f0f8fdb5a0a99e2e7be9c28fb93';
+        generateChart(cityAdcode, apiKey);
+
+        let currentDataType = 'weight';
+        let currentSpecies = 'Bream'; // Default to 'Bream'
+        let dynamicChart = echarts.init(document.getElementById('dynamicChart'));
+
+        function getXAxisRanges(type) {
+            const ranges = {
+                weight: ['0-50kg', '50-100kg', '100-150kg', '150-200kg', '200-250kg', '250-300kg', '>300kg'],
+                length: ['0-20cm', '20-40cm', '40-60cm', '60-80cm', '80-100cm', '100-120cm', '>120cm'],
+                width: ['0-10cm', '10-20cm', '20-30cm', '30-40cm', '40-50cm', '50-60cm', '>60cm']
+            };
+            return ranges[type] || [];
+        }
+
+        function getYAxisUnit(type) {
+            return {
+                weight: '(kg)',
+                length: '(cm)',
+                width: '(cm)'
+            }[type] || '';
+        }
+
+        function fetchData(type, species) {
+            return new Promise((resolve, reject) => {
+                const url = `/get${type}?species=${species}`;
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => resolve(data))
+                    .catch(error => reject(error));
+            });
+        }
+
+        async function updateDynamicChart() {
+            try {
+                const rawData = await fetchData(currentDataType, currentSpecies);
+                const ranges = getXAxisRanges(currentDataType);
+
+                const rangeCounts = new Array(ranges.length).fill(0);
+
+                rawData.forEach(value => {
+                    const numericValue = parseFloat(value);
+                    ranges.forEach((range, index) => {
+                        let min, max;
+                        if (range.startsWith('>')) {
+                            min = parseFloat(range.slice(1));
+                            max = Infinity;
+                        } else {
+                            const [minStr, maxStr] = range.split('-');
+                            min = parseFloat(minStr);
+                            max = parseFloat(maxStr);
+                        }
+                        if (numericValue >= min && numericValue < max) {
+                            rangeCounts[index]++;
+                        }
+                    });
+                });
+
+                const option = {
+                    title: {
+                        text: `${currentSpecies}鱼类分布 - ${getTypeLabel(currentDataType)}`,
+                        left: 'center',
+                        textStyle: {
+                            fontSize: 18,
+                            color: '#333'
+                        }
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        formatter: function (params) {
+                            return `${params[0].marker} ${params[0].seriesName}<br/>${params[0].axisValue}: ${params[0].data}条`;
+                        }
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: ranges,
+                        axisLabel: {
+                            rotate: 45,
+                            interval: 0
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                color: '#666'
+                            }
+                        }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        name: `数量 ${getYAxisUnit(currentDataType)}`,
+                        nameTextStyle: {
+                            color: '#666',
+                            padding: [0, 0, 0, 20]
+                        },
+                        splitLine: {
+                            show: true,
+                            lineStyle: {
+                                type: 'dashed'
+                            }
+                        }
+                    },
+                    series: [{
+                        name: '数量分布',
+                        type: 'line',
+                        smooth: true,
+                        symbol: 'circle',
+                        symbolSize: 8,
+                        lineStyle: {
+                            color: '#00796b',
+                            width: 3
+                        },
+                        itemStyle: {
+                            color: '#00796b',
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                offset: 0,
+                                color: 'rgba(0,121,107,0.3)'
+                            }, {
+                                offset: 1,
+                                color: 'rgba(0,121,107,0.01)'
+                            }])
+                        },
+                        data: rangeCounts
+                    }],
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '15%',
+                        containLabel: true
+                    }
+                };
+
+                dynamicChart.setOption(option);
+            } catch (error) {
+                console.error('Error fetching or processing data:', error);
+            }
+        }
+
+        document.getElementById('parameterSelect').addEventListener('change', function () {
+            currentDataType = this.value;
+            updateDynamicChart();
+        });
+
+        document.getElementById('speciesSelect').addEventListener('change', function () {
+            currentSpecies = this.value;
+            updateDynamicChart();
+        });
+
+        function getTypeLabel(type) {
+            return {
+                weight: '重量分布',
+                length: '长度分布',
+                width: '宽度分布'
+            }[type];
+        }
+
+        updateDynamicChart();
+
+        // 上传信息模拟
+        document.getElementById('uploadBtn').addEventListener('click', function () {
+            const length = document.getElementById('length').value;
+            const width = document.getElementById('width').value;
+            const height = document.getElementById('height').value;
+            const name = document.getElementById('name').value;
+
+            if (length && width && height && name) {
+                alert("信息上传成功！\n" +
+                    `名称: ${name}\n` +
+                    `长度: ${length} cm\n` +
+                    `宽度: ${width} cm\n` +
+                    `高度: ${height} cm`);
+            } else {
+                alert("请完整填写所有信息！");
+            }
+        });
+
+        // 下载动态图表功能
+        document.getElementById('downloadDynamicChartBtn').addEventListener('click', function () {
+            const imageUrl = dynamicChart.getDataURL();
+            const link = document.createElement('a');
+            link.href = imageUrl;
+            link.download = 'dynamic_chart.png';
+            link.click();
+        });
     </script>
+
 </body>
 
 </html>
